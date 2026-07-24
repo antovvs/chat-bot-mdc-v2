@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Assistant MDC Qualité</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23465658' d='M12 21s7-3.5 7-9V5.5L12 3 5 5.5V12c0 5.5 7 9 7 9Z'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='m9 12 2 2 4-4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f3f5f6;
+    --surface: #ffffff;
+    --surface-2: #eef1f2;
+    --border: #e1e6e8;
+    --slate: #465658;
+    --slate-2: #5c7175;
+    --pink: #cd0d45;
+    --pink-2: #e2295e;
+    --text: #263133;
+    --muted: #6f7a7e;
+    --danger: #b3261e;
+    --radius: 18px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    height: 100%;
+    margin: 0;
+  }
+
+  body{
+    font-family: 'Inter', system-ui, sans-serif;
+    background:
+      radial-gradient(1100px 560px at 12% -12%, rgba(205,13,69,0.06), transparent 60%),
+      radial-gradient(900px 520px at 105% 0%, rgba(70,86,88,0.07), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  svg.icon{ width: 100%; height: 100%; }
+
+  /* ---------- Header ---------- */
+  header{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: calc(14px + var(--safe-top)) 20px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-mark{
+    width: 38px;
+    height: 38px;
+    flex: none;
+    padding: 4px;
+    border-radius: 11px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(38,49,51,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .brand-mark img{ width: 100%; height: 100%; object-fit: contain; }
+
+  .brand-text{ min-width: 0; }
+
+  .brand-text h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-text p{
+    margin: 1px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .status-dot{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22a35a;
+    box-shadow: 0 0 0 3px rgba(34,163,90,0.15);
+    flex: none;
+  }
+
+  .reset-btn{
+    flex: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    font-family: inherit;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .reset-btn:hover{ color: var(--slate); border-color: #c7cfd1; }
+  .reset-btn:focus-visible{ outline: 2px solid var(--pink); outline-offset: 2px; }
+  .reset-btn svg{ width: 14px; height: 14px; }
+
+  /* ---------- Chat area ---------- */
+  #chatbox{
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 20px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  #chatbox::-webkit-scrollbar{ width: 8px; }
+  #chatbox::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 8px; }
+  #chatbox::-webkit-scrollbar-track{ background: transparent; }
+
+  .empty-state{
+    margin: auto;
+    text-align: center;
+    color: var(--muted);
+    max-width: 380px;
+    padding: 24px;
+  }
+  .empty-state .glyph{
+    width: 64px; height: 64px; margin: 0 auto 14px;
+    padding: 8px;
+    border-radius: 15px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 18px rgba(38,49,51,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .empty-state .glyph img{ width: 100%; height: 100%; object-fit: contain; }
+  .empty-state h2{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    margin: 0 0 6px;
+    font-weight: 600;
+  }
+  .empty-state p{ font-size: 13px; line-height: 1.5; margin: 0 0 18px; }
+
+  .starter-chips{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .chip{
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--slate);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 8px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .chip:hover{ border-color: var(--pink); color: var(--pink); background: #fff; }
+  .chip:focus-visible{ outline: 2px solid var(--pink); outline-offset: 2px; }
+
+  .row{
+    display: flex;
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 10px;
+  }
+  .row.user{ justify-content: flex-end; }
+  .row.bot{ justify-content: flex-start; }
+
+  .avatar, .avatar-spacer{
+    flex: none;
+    width: 30px;
+    height: 30px;
+  }
+  .avatar{
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 3px;
+    overflow: hidden;
+  }
+  .avatar img{ width: 100%; height: 100%; object-fit: contain; }
+  .row.user .avatar{ display: none; }
+
+  .bubble{
+    padding: 11px 15px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    line-height: 1.5;
+    max-width: min(78%, 560px);
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  .row.bot .bubble{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top-left-radius: 6px;
+    color: var(--text);
+  }
+
+  .row.user .bubble{
+    background: linear-gradient(135deg, var(--slate), var(--slate-2));
+    color: #fff;
+    border-top-right-radius: 6px;
+    box-shadow: 0 4px 14px rgba(70,86,88,0.22);
+  }
+
+  .bubble.error{
+    background: rgba(179,38,30,0.06);
+    border: 1px solid rgba(179,38,30,0.3);
+    color: var(--danger);
+  }
+
+  /* typing indicator */
+  .typing{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 2px;
+  }
+  .typing span{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2){ animation-delay: 0.15s; }
+  .typing span:nth-child(3){ animation-delay: 0.3s; }
+  @keyframes bounce{
+    0%, 60%, 100%{ transform: translateY(0); opacity: 0.5; }
+    30%{ transform: translateY(-4px); opacity: 1; }
+  }
+
+  @keyframes fadeUp{
+    from{ opacity: 0; transform: translateY(6px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+  .row{ animation: fadeUp 0.25s ease; }
+
+  /* ---------- Action rows (contact / comprehension check) ---------- */
+  .actions-box{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: min(78%, 560px);
+    animation: fadeUp 0.25s ease;
+  }
+  .actions-label{
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .actions-buttons{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    transition: filter 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .pill-btn:hover{ border-color: var(--pink); color: var(--pink); }
+  .pill-btn:focus-visible{ outline: 2px solid var(--pink); outline-offset: 2px; }
+
+  .pill-btn.accent{
+    background: linear-gradient(135deg, var(--pink), var(--pink-2));
+    color: #fff;
+    border: none;
+  }
+  .pill-btn.accent:hover{ filter: brightness(1.06); color: #fff; }
+
+  .pill-btn.filled{
+    background: linear-gradient(135deg, var(--slate), var(--slate-2));
+    color: #fff;
+    border: none;
+  }
+  .pill-btn.filled:hover{ filter: brightness(1.08); color: #fff; }
+
+  /* ---------- Input area ---------- */
+  #composer{
+    flex: 0 0 auto;
+    padding: 12px 16px calc(14px + var(--safe-bottom));
+    border-top: 1px solid var(--border);
+    background: linear-gradient(180deg, transparent, rgba(243,245,246,0.7) 20%, var(--bg) 60%);
+  }
+
+  #form{
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 8px 8px 16px;
+    box-shadow: 0 2px 10px rgba(38,49,51,0.04);
+    transition: border-color 0.15s ease;
+  }
+  #form:focus-within{ border-color: var(--pink); }
+
+  #input{
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.4;
+    max-height: 120px;
+    padding: 8px 0;
+  }
+  #input::placeholder{ color: var(--muted); }
+
+  #send{
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--pink), var(--pink-2));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+  #send:disabled{ opacity: 0.4; cursor: not-allowed; }
+  #send:not(:disabled):active{ transform: scale(0.92); }
+  #send:focus-visible{ outline: 2px solid var(--pink); outline-offset: 2px; }
+  #send svg{ width: 18px; height: 18px; }
+
+  .signature{
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin: 10px 0 0;
+    letter-spacing: 0.01em;
+  }
+  .signature .beta{
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgba(205,13,69,0.08);
+    color: var(--pink);
+    border: 1px solid rgba(205,13,69,0.25);
+    vertical-align: middle;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  @media (max-width: 480px){
+    header{ padding: calc(12px + var(--safe-top)) 14px 12px; }
+    .brand-text h1{ font-size: 15px; }
+    #chatbox{ padding: 16px 10px 8px; }
+    .bubble{ max-width: 86%; font-size: 14px; }
+    .actions-box{ max-width: 92%; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="/static/logo-mdc.webp" alt="MDC Qualité">
+      </div>
+      <div class="brand-text">
+        <h1>Assistant MDC Qualité</h1>
+        <p><span class="status-dot"></span>En ligne</p>
+      </div>
+    </div>
+    <button class="reset-btn" id="resetBtn" type="button" title="Nouvelle conversation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+      <span>Nouveau</span>
+    </button>
+  </header>
+
+  <div id="chatbox">
+    <div class="empty-state" id="emptyState">
+      <div class="glyph">
+        <img src="/static/logo-mdc.webp" alt="MDC Qualité">
+      </div>
+      <h2>Comprendre les certifications ISO</h2>
+      <p>Posez une question sur l'ISO 9001, l'ISO 14001, QUALIOPI ou toute autre norme — l'assistant de MDC Qualité vous explique simplement.</p>
+      <div class="starter-chips" id="starterChips"></div>
+    </div>
+  </div>
+
+  <div id="composer">
+    <form id="form">
+      <textarea id="input" rows="1" placeholder="Écris ton message..." autocomplete="off"></textarea>
+      <button id="send" type="submit" aria-label="Envoyer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      </button>
+    </form>
+    <p class="signature">Créé par Antoine Dehant<span class="beta">bêta</span></p>
+  </div>
+
+<script>
+  const chatbox = document.getElementById('chatbox');
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const sendBtn = document.getElementById('send');
+  const resetBtn = document.getElementById('resetBtn');
+  const emptyState = document.getElementById('emptyState');
+  const starterChips = document.getElementById('starterChips');
+
+  const PHONE_DISPLAY = '04 30 30 33 21';
+  const PHONE_TEL = '+33430303321';
+  const EMAIL = 'contact@mdcqualite.fr';
+
+  const STARTERS = [
+    "Qu'est-ce que la certification ISO 9001 ?",
+    "Qu'est-ce que la certification ISO 14001 ?",
+    "Qu'est-ce que la certification ISO 45001 ?",
+    "C'est quoi QUALIOPI ?",
+    "Comment se faire accompagner par MDC Qualité ?"
+  ];
+
+  STARTERS.forEach((text) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = text;
+    chip.addEventListener('click', () => sendText(text));
+    starterChips.appendChild(chip);
+  });
+
+  function scrollToBottom(){
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  function hideEmptyState(){
+    if (emptyState.isConnected) emptyState.remove();
+  }
+
+  function clearActiveActions(){
+    chatbox.querySelectorAll('.actions-box').forEach((el) => el.remove());
+  }
+
+  function addMessage(text, sender){
+    hideEmptyState();
+    const row = document.createElement('div');
+    row.className = 'row ' + sender;
+
+    if (sender === 'bot'){
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.innerHTML = '<img src="/static/logo-mdc.webp" alt="MDC Qualité">';
+      row.appendChild(avatar);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+
+    chatbox.appendChild(row);
+    scrollToBottom();
+    return bubble;
+  }
+
+  function addTyping(){
+    hideEmptyState();
+    const row = document.createElement('div');
+    row.className = 'row bot';
+    row.id = 'typingRow';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = '<img src="/static/logo-mdc.webp" alt="MDC Qualité">';
+    row.appendChild(avatar);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
+    row.appendChild(bubble);
+
+    chatbox.appendChild(row);
+    scrollToBottom();
+  }
+
+  function removeTyping(){
+    const row = document.getElementById('typingRow');
+    if (row) row.remove();
+  }
+
+  function addActions(data){
+    const wrap = document.createElement('div');
+    wrap.className = 'row bot actions-box';
+
+    const spacer = document.createElement('div');
+    spacer.className = 'avatar-spacer';
+    wrap.appendChild(spacer);
+
+    const box = document.createElement('div');
+    box.style.display = 'flex';
+    box.style.flexDirection = 'column';
+    box.style.gap = '10px';
+    box.style.maxWidth = 'min(78%, 560px)';
+
+    if (data.offer_contact){
+      const block = document.createElement('div');
+      const label = document.createElement('p');
+      label.className = 'actions-label';
+      label.textContent = 'Pour aller plus loin :';
+      block.appendChild(label);
+
+      const buttons = document.createElement('div');
+      buttons.className = 'actions-buttons';
+
+      const telBtn = document.createElement('a');
+      telBtn.className = 'pill-btn accent';
+      telBtn.href = 'tel:' + PHONE_TEL;
+      telBtn.innerHTML = '📞 ' + PHONE_DISPLAY;
+      buttons.appendChild(telBtn);
+
+      const mailBtn = document.createElement('a');
+      mailBtn.className = 'pill-btn';
+      mailBtn.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent('Question sur une certification ISO');
+      mailBtn.innerHTML = '✉️ Nous écrire';
+      buttons.appendChild(mailBtn);
+
+      block.appendChild(buttons);
+      box.appendChild(block);
+    }
+
+    if (data.ask_understood){
+      const block = document.createElement('div');
+      const label = document.createElement('p');
+      label.className = 'actions-label';
+      label.textContent = 'As-tu bien tout compris ?';
+      block.appendChild(label);
+
+      const buttons = document.createElement('div');
+      buttons.className = 'actions-buttons';
+
+      const yesBtn = document.createElement('button');
+      yesBtn.type = 'button';
+      yesBtn.className = 'pill-btn filled';
+      yesBtn.textContent = '✅ Oui, c\'est clair';
+      yesBtn.addEventListener('click', () => sendText("Oui, j'ai bien compris, merci !"));
+      buttons.appendChild(yesBtn);
+
+      const noBtn = document.createElement('button');
+      noBtn.type = 'button';
+      noBtn.className = 'pill-btn';
+      noBtn.textContent = '🤔 Pas totalement';
+      noBtn.addEventListener('click', () => sendText("Non, je n'ai pas tout compris."));
+      buttons.appendChild(noBtn);
+
+      block.appendChild(buttons);
+      box.appendChild(block);
+    }
+
+    wrap.appendChild(box);
+    chatbox.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  function autoGrow(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  }
+  input.addEventListener('input', autoGrow);
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  async function sendText(message){
+    message = (message || '').trim();
+    if (!message) return;
+
+    clearActiveActions();
+    addMessage(message, 'user');
+    input.value = '';
+    autoGrow();
+    sendBtn.disabled = true;
+    addTyping();
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+      removeTyping();
+
+      if (!response.ok){
+        const bubble = addMessage(data.error || 'Une erreur est survenue.', 'bot');
+        bubble.classList.add('error');
+      } else {
+        addMessage(data.reply, 'bot');
+        if (data.offer_contact || data.ask_understood){
+          addActions(data);
+        }
+      }
+    } catch (err) {
+      removeTyping();
+      const bubble = addMessage('Impossible de contacter le serveur.', 'bot');
+      bubble.classList.add('error');
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    sendText(input.value);
+  });
+
+  resetBtn.addEventListener('click', async () => {
+    try {
+      await fetch('/api/reset', { method: 'POST' });
+    } catch (err) {
+      // silencieux : la remise à zéro visuelle se fait quand même
+    }
+    chatbox.innerHTML = '';
+    chatbox.appendChild(emptyState);
+  });
+</script>
+
+</body>
+</html>
